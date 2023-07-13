@@ -1,0 +1,57 @@
+apiVersion: apps/v1      
+kind: Deployment  
+metadata:     
+  name: tomcat-deployment
+  namespace: chan
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: myweb
+  template:
+    metadata:
+      name: tomcat-pod
+      labels:
+        app: myweb
+    spec:
+      containers:
+      - name: tomcat-container
+        image: docker.io/jeonghyuck/was:0.4
+        
+        resources:
+          limits:
+            cpu: "0.5"
+            memory: 1Gi
+        ports:
+        - containerPort: 8080         
+        env:
+        - name: db_url
+          valueFrom:
+            secretKeyRef:
+              name: tomcat-secret
+              key: DB_URL
+        - name: db_user
+          valueFrom:
+            secretKeyRef:
+              name: tomcat-secret
+              key: DB_USER
+        - name: db_password
+          valueFrom:
+            secretKeyRef:
+              name: tomcat-secret
+              key: DB_PASSWORD
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tomcat-service
+  namespace: chan
+spec:
+  ports:
+  - name: myweb-svc
+    port: 8080 
+    targetPort: 8080  
+    nodePort: 30001  
+  selector:
+    app: myweb   
+  type: NodePort

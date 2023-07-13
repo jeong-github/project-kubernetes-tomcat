@@ -1,0 +1,44 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: php-fpm-nginx-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: php-fpm-nginx
+  template:
+    metadata:
+      labels:
+        app: php-fpm-nginx
+    spec:
+      containers:
+      - name: php-fpm
+        image: php:7.4-fpm
+        volumeMounts:
+        - name: vol-sock
+          mountPath: /sock
+      - name: nginx
+        image: nginx:1.21
+        volumeMounts:
+        - name: vol-sock
+          mountPath: /sock
+      volumes:
+      - name: vol-sock
+        emptyDir: {}
+
+---
+apiVersion: v1
+kind: Service
+metadata: 
+  name: nginx-php-service
+spec:
+  selector:
+    app: php-fpm-nginx
+  ports:
+    - port: 8080
+      targetPort: 80
+      
+
+

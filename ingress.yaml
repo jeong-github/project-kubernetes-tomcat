@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: myweb-ingress
+  namespace: chan
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: "tomcat.chan.com"
+    http:
+      paths:
+        - pathType: Prefix
+          path: "/"
+          backend:
+            service:
+              name: tomcat-service
+              port:
+                number: 8080

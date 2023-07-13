@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: mysql-replica
+  namespace: chan
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      name: mysql-pod
+      labels:
+        app: mysql
+    spec:
+        containers:
+        - name: mysql-container
+          image: docker.io/mysql:8.0
+          ports:
+          - containerPort: 3306
+          env:
+          - name: MYSQL_ROOT_PASSWORD
+            value: "password"
+          - name: MYSQL_USER
+            value: "myuser"
+          - name: MYSQL_PASSWORD
+            value: "mypassword" 
+                      
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-service
+  namespace: chan
+spec:
+  ports:
+  - port: 3306
+    targetPort: 3306
+  selector:
+    app: mysql
+  type: ClusterIP
+
+
+
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: mysql-deploy
+#   namespace: chan
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: mysql
+#   template:
+#     metadata:
+#       name: mysql-pod
+#       labels:
+#         app: mysql
+#     spec:
+#       containers:
+#       - name: mysql-container
+#         image: docker.io/mysql
+#         ports:
+#           - containerPort: 2700
+
+#         env:
+#           - name: MYSQL_ROOT_USERNAME
+#             valueFrom: 
+#               secretKeyRef:
+#                 name: mysql-secret
+#                 key: mysql-root-username
+                
+#           - name: MYSQL_ROOT_PASSWORD
+#             valueFrom: 
+#               secretKeyRef:
+#                 name: mysql-secret
+#                 key: mysql-root-password
+
+
+

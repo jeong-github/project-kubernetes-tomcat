@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tomcatproject1-deployment
+  namespace: chan
+  labels:
+    app: tomcatproject1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tomcatproject1
+  template:
+    metadata:
+      labels:
+        app: tomcatproject1
+    spec:
+      containers:
+      - name: tomcatproject1
+        image: tomcat:8.5.53
+        env:
+        - name: JAVA_OPTS
+          value: "-Xms512m -Xmx512m"
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - name: projectvol1
+          mountPath: /usr/local/tomcat/webapps
+          readOnly: false
+      volumes:
+      - name : projectvol1
+        hostPath:
+          path: /var/lib/tomcat
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tomcatproject1-svc
+  namespace: chan
+spec:
+  selector:
+    app: tomcatproject1
+  ports:
+    - port: 8090
+      targetPort: 8080
+
+
